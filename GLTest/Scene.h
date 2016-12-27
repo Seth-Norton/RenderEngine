@@ -1,4 +1,6 @@
 #pragma once
+#include "GL/glew.h"
+
 #include "Model.h"
 
 
@@ -8,10 +10,13 @@ public:
 	Scene();
 	~Scene();
 
-	Model* getAllModels();
+	Model** getModels();
+	GLuint numModels();
 	void addModel(Model* newModel);
 
 private:
-	Model* models;
+	GLuint allowedModels = 8;
+	Model** models = nullptr;
+	GLuint n = 0;
 };
 
