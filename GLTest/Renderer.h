@@ -19,11 +19,18 @@ public:
 	void frameDone(void);
 
 private:
-	SDL_Window* window;
+	SDL_Window* window = nullptr;
 	SDL_GLContext context;
 
 	GLuint material;
 
+	Uint32 prevFrame = 0;
+	Uint32 avgFrame = 0;
+	Uint32 prevUpdate = 0;
+	Uint32 FPS_UPDATE_INTERVAL = 60;
+	Uint32 time = 0;
+	Uint32 eTime = 0;
+	Uint32 updateTime = 0;
 
 	
 };
