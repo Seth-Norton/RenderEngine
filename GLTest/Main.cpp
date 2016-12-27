@@ -35,15 +35,22 @@ int main()
 		printf("%s\n", SDL_GetError());
 
 
-
-
 	Renderer mainRend(window);
+
+	Model cube;
+	cube.loadBox();
+
+	Scene world;
+	world.addModel(&cube);
+
+
 
 
 
 	
+
+
 	SDL_Event e;
-	Uint32 prevFrame = 0;
 	while (!done) {
 		while (SDL_PollEvent(&e)) {
 			if (e.type == SDL_QUIT)
@@ -56,13 +63,12 @@ int main()
 			}
 		}
 
-		Uint32 time = SDL_GetTicks();
-		if (time > prevFrame + 16) {
-			printf("%f\r", 1/float(time-prevFrame)*1000);
-			prevFrame = time;
-			mainRend.render(Scene(), SDL_GetTicks(), 15);
-			mainRend.frameDone();
-		}
+		
+
+
+		//	Prepare render and flush commands
+		mainRend.render(world, SDL_GetTicks(), 15);
+		mainRend.frameDone();
 	}
 
 

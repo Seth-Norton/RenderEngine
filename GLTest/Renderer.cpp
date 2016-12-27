@@ -7,6 +7,7 @@ Renderer::Renderer(SDL_Window* w)
 {
 	this->window = w;
 
+
 	//	GL Context
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
@@ -23,13 +24,24 @@ Renderer::Renderer(SDL_Window* w)
 		printf("ERROR: Could not initialize GLEW - %s\n", glewGetErrorString(glewError));
 	}
 
+	//	VSync
+	SDL_GL_SetSwapInterval(1);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+
 	Material bland;
-	bland.loadProgram("smoothVertex", "smoothFrag");
+	bland.loadProgram("smoothVertex.glsl", "smoothFrag.glsl");
 
 	//	Initial clear
 	glClearColor(0, 0, 0, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(this->window);
+
+
+	//	Prepare timing
+	this->prevFrame = SDL_GetTicks();
+	this->avgFrame = 17;
+	this->prevUpdate = SDL_GetTicks();
 }
 
 
@@ -39,13 +51,46 @@ Renderer::~Renderer()
 
 void Renderer::render(Scene scene, Uint32 startTime, Uint32 budget)
 {
-	glClearColor(.8, .2, .5, 1);
+	Model** models = scene.getModels();
+	GLuint numModels = scene.numModels();
+
+	SDL_GL_MakeCurrent(this->window, this->context);
+
+	glEnable(GL_DEPTH_TEST);
+	
+	//	Debug
+	/*glBegin(GL_TRIANGLES);
+	glColor3f(0, 0, 1);
+	glVertex3f(0.0f, 1.0f, 0.0f);
+	glVertex3f(0.87f, -0.5f, 0.0f);
+	glVertex3f(-0.87f,-0.5f, 0.0f);
+	glEnd();*/
+
+	glBindVertexArray(models[0]->vao());
+	glDrawElements(GL_TRIANGLES, models[0]->numFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+	glBindVertexArray(0);
+
+	glDisable(GL_DEPTH_TEST);
+	
+
+
+	//	Time Handling
+	this->time = SDL_GetTicks();
+	this->eTime = this->time - this->prevFrame;
+	this->avgFrame = 0.4*this->avgFrame + 0.6*this->eTime;
+	this->updateTime = this->time - this->prevUpdate;
+	if (this->avgFrame > 0 && this->updateTime > this->FPS_UPDATE_INTERVAL*this->avgFrame) {
+		printf("%d msecs, %4.1f FPS\r", this->avgFrame, 1.0f / (float)this->avgFrame*1000.0f);
+		this->prevUpdate = this->time;
+	}
+	this->prevFrame = this->time;
 }
 
 void Renderer::frameDone(void)
 {
+	glClearColor(.8, .2, .5, 1);
 	SDL_GL_SwapWindow(this->window);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 
