@@ -87,7 +87,7 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	const GLchar* shaderSource[] =	//	TODO: Load from text file
 	{
-		"#version 140\nin vec2 LVertexPos2D; void main() { gl_Position = vec4( LVertexPos2D.x, LVertexPos2D.y, 0, 1 ); }"
+		"#version 330\nin vec4 vPosition; void main() { gl_Position = vPosition; }"
 	};
 
 	glShaderSource(vertexShader, 1, shaderSource, NULL);
@@ -101,14 +101,14 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 		success = false;
 		return success;
 	}
-	glAttachShader(program, vertexShader);
+	
 
 
 	//	Fragment Shader
 	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 	const GLchar* fragShaderSource[] =
 	{
-		"#version 140\nout vec4 LFragment; void main() { LFragment = vec4( 1.0, 1.0, 1.0, 1.0 ); }"
+		"#version 330\nout vec4 LFragment; void main() { LFragment = vec4( 1.0, 0.5, 0.2, 1.0 ); }"
 	};
 
 	glShaderSource(fragShader, 1, fragShaderSource, NULL);
@@ -122,6 +122,13 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 		success = false;
 		return success;
 	}
+
+
+
+
+
+	//	Link Program
+	glAttachShader(program, vertexShader);
 	glAttachShader(program, fragShader);
 
 	glLinkProgram(program);
@@ -134,6 +141,9 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 		return success;
 	}
 
+	glUseProgram(program);
+	glDeleteShader(vertexShader);
+	glDeleteShader(fragShader);
 
 	printf("Successfully loaded %s, %s\n", vertexFilepath, fragFilepath);
 
