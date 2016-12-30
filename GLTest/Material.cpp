@@ -75,22 +75,19 @@ void Material::printShaderLog(GLuint shader)
 	}
 }
 
-bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepath)
-{
-	bool success = true;
-
-	GLuint program = glCreateProgram();
 
 
+
+
+
+bool Material::loadSources(const GLchar** vertexSource, const GLchar** fragSource) {
+	this->program = glCreateProgram();
 
 	//	Vertex Shader
 	GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	const GLchar* shaderSource[] =	//	TODO: Load from text file
-	{
-		"#version 330\nin vec4 vPosition; void main() { gl_Position = vPosition; }"
-	};
+	
 
-	glShaderSource(vertexShader, 1, shaderSource, NULL);
+	glShaderSource(vertexShader, 1, vertexSource, NULL);
 	glCompileShader(vertexShader);
 	GLint shaderCompiled = GL_FALSE;
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &shaderCompiled);
@@ -98,20 +95,16 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 	{
 		printf("Unable to compile vertex shader %d!\n", vertexShader);
 		printShaderLog(vertexShader);
-		success = false;
-		return success;
+		return false;
 	}
-	
+
 
 
 	//	Fragment Shader
 	GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-	const GLchar* fragShaderSource[] =
-	{
-		"#version 330\nout vec4 LFragment; void main() { LFragment = vec4( 1.0, 0.5, 0.2, 1.0 ); }"
-	};
+	
 
-	glShaderSource(fragShader, 1, fragShaderSource, NULL);
+	glShaderSource(fragShader, 1, fragSource, NULL);
 	glCompileShader(fragShader);
 
 	shaderCompiled = GL_FALSE;
@@ -119,8 +112,7 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 	if (shaderCompiled != GL_TRUE) {
 		printf("Unable to compile fragment shader %d!\n", fragShader);
 		printShaderLog(fragShader);
-		success = false;
-		return success;
+		return false;
 	}
 
 
@@ -128,26 +120,69 @@ bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepat
 
 
 	//	Link Program
-	glAttachShader(program, vertexShader);
-	glAttachShader(program, fragShader);
+	glAttachShader(this->program, vertexShader);
+	glAttachShader(this->program, fragShader);
 
-	glLinkProgram(program);
-	glGetProgramiv(program, GL_LINK_STATUS, &shaderCompiled);
+	glLinkProgram(this->program);
+	glGetProgramiv(this->program, GL_LINK_STATUS, &shaderCompiled);
 	if (shaderCompiled != GL_TRUE)
 	{
-		printf("Error linking program %d!\n", program);
-		printProgramLog(program);
-		success = false;
-		return success;
+		printf("Error linking program %d!\n", this->program);
+		printProgramLog(this->program);
+		return false;
 	}
 
-	glUseProgram(program);
+	glUseProgram(this->program);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragShader);
 
-	printf("Successfully loaded %s, %s\n", vertexFilepath, fragFilepath);
+	return true;
+}
 
-	return success;
+
+
+
+
+bool Material::loadDefault() {
+	const GLchar* vertexSource[] =	
+	{
+		"#version 330\nin vec4 vPosition; void main() { gl_Position = vPosition; }"
+	};
+
+	const GLchar* fragSource[] =
+	{
+		"#version 330\nout vec4 LFragment; void main() { LFragment = vec4( 1.0, 0.5, 0.2, 1.0 ); }"
+	};
+
+	bool success = loadSources(vertexSource, fragSource);
+	if (success) {
+		printf("Successfully loaded default shaders\n");
+		return true;
+	}
+	else {
+		printf("Error: Failed to load default shaders\n");
+		return false;
+	}
+}
+
+
+
+
+
+bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepath)
+{
+	bool success = false;
+
+	//	TODO: Load from text files
+	
+	if (success) {
+		printf("Successfully loaded %s, %s\n", vertexFilepath, fragFilepath);
+		return true;
+	}
+	else {
+		printf("Error: Failed to load %s or %s\n", vertexFilepath, fragFilepath);
+		return false;
+	}
 }
 
 

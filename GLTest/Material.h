@@ -18,9 +18,15 @@ public:
 	
 
 	bool loadProgram(const char* vertexFilepath, const char* fragFilepath);
+	bool loadDefault();
 
 private:
+	GLuint program = 0;
+
 	void printProgramLog(GLuint program);
 	void printShaderLog(GLuint shader);
+
+	bool loadSources(const GLchar** vertexSource, const GLchar** fragSource);
+	
 };
 
