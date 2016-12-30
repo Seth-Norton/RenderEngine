@@ -27,7 +27,7 @@ private:
 	Uint32 prevFrame = 0;
 	Uint32 avgFrame = 0;
 	Uint32 prevUpdate = 0;
-	Uint32 FPS_UPDATE_INTERVAL = 60;
+	Uint32 FPS_UPDATE_INTERVAL = 10;
 	Uint32 time = 0;
 	Uint32 eTime = 0;
 	Uint32 updateTime = 0;

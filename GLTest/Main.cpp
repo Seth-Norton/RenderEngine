@@ -41,7 +41,9 @@ int main()
 	cube.loadBox();
 
 	Scene world;
-	world.addModel(&cube);
+
+	for(int i = 0; i<10000; i++)
+		world.addModel(&cube);
 
 
 
