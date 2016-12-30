@@ -17,7 +17,7 @@ public:
 
 	
 
-	bool loadProgram(const char* vertexFilepath, const char* fragFilepath);
+	bool loadProgram(const GLchar* vertexFilepath, const GLchar* fragFilepath);
 	bool loadDefault();
 
 private:
@@ -26,7 +26,9 @@ private:
 	void printProgramLog(GLuint program);
 	void printShaderLog(GLuint shader);
 
-	bool loadSources(const GLchar** vertexSource, const GLchar** fragSource);
+	char* textFileRead(const GLchar* fn);
+
+	bool loadSources(GLchar** vertexSource, GLchar** fragSource);
 	
 };
 

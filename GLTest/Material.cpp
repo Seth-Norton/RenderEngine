@@ -76,11 +76,40 @@ void Material::printShaderLog(GLuint shader)
 }
 
 
+char* Material::textFileRead(const GLchar* filePath) {
+	FILE* filePointer;
+	char* content = NULL;
+
+	int count = 0;
+
+	if (filePath != NULL) {
+		filePointer = fopen(filePath, "rt");
+
+		if (filePointer != NULL) {
+
+			fseek(filePointer, 0, SEEK_END);
+			count = ftell(filePointer);
+			rewind(filePointer);
+
+			if (count > 0) {
+				content = (char *)malloc(sizeof(char) * (count + 1));
+				count = fread(content, sizeof(char), count, filePointer);
+				content[count] = '\0';
+			}
+			fclose(filePointer);
+		}
+	}
+	return content;
+}
 
 
 
 
-bool Material::loadSources(const GLchar** vertexSource, const GLchar** fragSource) {
+
+
+bool Material::loadSources(GLchar** vertexSource, GLchar** fragSource) {
+	printf("Loading %p and %p\n", *vertexSource, *fragSource);
+
 	this->program = glCreateProgram();
 
 	//	Vertex Shader
@@ -144,12 +173,12 @@ bool Material::loadSources(const GLchar** vertexSource, const GLchar** fragSourc
 
 
 bool Material::loadDefault() {
-	const GLchar* vertexSource[] =	
+	GLchar* vertexSource[] =	
 	{
 		"#version 330\nin vec4 vPosition; void main() { gl_Position = vPosition; }"
 	};
 
-	const GLchar* fragSource[] =
+	GLchar* fragSource[] =
 	{
 		"#version 330\nout vec4 LFragment; void main() { LFragment = vec4( 1.0, 0.5, 0.2, 1.0 ); }"
 	};
@@ -169,12 +198,12 @@ bool Material::loadDefault() {
 
 
 
-bool Material::loadProgram(const char * vertexFilepath, const char * fragFilepath)
+bool Material::loadProgram(const GLchar * vertexFilepath, const GLchar * fragFilepath)
 {
-	bool success = false;
+	GLchar* vertexSource = textFileRead(vertexFilepath);
+	GLchar* fragSource = textFileRead(fragFilepath);
 
-	//	TODO: Load from text files
-	
+	bool success = loadSources(&vertexSource, &fragSource);
 	if (success) {
 		printf("Successfully loaded %s, %s\n", vertexFilepath, fragFilepath);
 		return true;
