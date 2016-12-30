@@ -30,7 +30,8 @@ Renderer::Renderer(SDL_Window* w)
 
 
 	Material bland;
-	bland.loadProgram("smoothVertex.glsl", "smoothFrag.glsl");
+	if(!bland.loadProgram("smoothVertex.glsl", "smoothFrag.glsl"))	//	In case of failure, load default textures
+		bland.loadDefault();
 
 	//	Initial clear
 	glClearColor(0, 0, 0, 1);
@@ -66,9 +67,15 @@ void Renderer::render(Scene scene, Uint32 startTime, Uint32 budget)
 	glVertex3f(-0.87f,-0.5f, 0.0f);
 	glEnd();*/
 
-	glBindVertexArray(models[0]->vao());
-	glDrawElements(GL_TRIANGLES, models[0]->numFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+	GLuint drawnTriangles = 0;
+
+	for (GLuint i = 0; i < numModels; i++) {
+		glBindVertexArray(models[i]->vao());
+		glDrawElements(GL_TRIANGLES, models[i]->numFaces() * 3, GL_UNSIGNED_INT, (void*)0);
+		drawnTriangles += models[i]->numFaces();
+	}
 	glBindVertexArray(0);
+	
 
 	glDisable(GL_DEPTH_TEST);
 	
@@ -80,7 +87,7 @@ void Renderer::render(Scene scene, Uint32 startTime, Uint32 budget)
 	this->avgFrame = 0.4*this->avgFrame + 0.6*this->eTime;
 	this->updateTime = this->time - this->prevUpdate;
 	if (this->avgFrame > 0 && this->updateTime > this->FPS_UPDATE_INTERVAL*this->avgFrame) {
-		printf("%d msecs, %4.1f FPS\r", this->avgFrame, 1.0f / (float)this->avgFrame*1000.0f);
+		printf("%d triangles: %d msecs, %4.1f FPS\r", drawnTriangles, this->avgFrame, 1.0f / (float)this->avgFrame*1000.0f);
 		this->prevUpdate = this->time;
 	}
 	this->prevFrame = this->time;
