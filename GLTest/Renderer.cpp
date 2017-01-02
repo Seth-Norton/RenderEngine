@@ -30,7 +30,7 @@ Renderer::Renderer(SDL_Window* w)
 
 
 	Material bland;
-	if(!bland.loadProgram("smoothVertex.glsl", "smoothFrag.glsl"))	//	In case of failure, load default textures
+	if(!bland.loadProgram("smoothVertex.glsl", "smoothFragment.glsl"))	//	In case of failure, load default textures
 		bland.loadDefault();
 
 	//	Initial clear
