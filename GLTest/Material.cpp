@@ -98,6 +98,9 @@ char* Material::textFileRead(const GLchar* filePath) {
 			}
 			fclose(filePointer);
 		}
+		else {
+			printf("Could not open %s\n", filePath);
+		}
 	}
 	return content;
 }
@@ -108,8 +111,6 @@ char* Material::textFileRead(const GLchar* filePath) {
 
 
 bool Material::loadSources(GLchar** vertexSource, GLchar** fragSource) {
-	printf("Loading %p and %p\n", *vertexSource, *fragSource);
-
 	this->program = glCreateProgram();
 
 	//	Vertex Shader
@@ -198,10 +199,16 @@ bool Material::loadDefault() {
 
 
 
-bool Material::loadProgram(const GLchar * vertexFilepath, const GLchar * fragFilepath)
+bool Material::loadProgram(const GLchar* vertexFilepath, const GLchar* fragFilepath)
 {
 	GLchar* vertexSource = textFileRead(vertexFilepath);
 	GLchar* fragSource = textFileRead(fragFilepath);
+	if (vertexSource == nullptr || fragSource == nullptr) {
+		printf("Missing shader file\n");
+		return false;
+	}
+
+
 
 	bool success = loadSources(&vertexSource, &fragSource);
 	if (success) {
@@ -209,7 +216,7 @@ bool Material::loadProgram(const GLchar * vertexFilepath, const GLchar * fragFil
 		return true;
 	}
 	else {
-		printf("Error: Failed to load %s or %s\n", vertexFilepath, fragFilepath);
+		printf("Error: Failed to load shaders\n");
 		return false;
 	}
 }
