@@ -34,7 +34,7 @@ Renderer::Renderer(SDL_Window* w)
 		bland.loadDefault();
 
 	//	Initial clear
-	glClearColor(0, 0, 0, 1);
+	glClearColor(.8, .2, .5, 1);
 	glClear(GL_COLOR_BUFFER_BIT);
 	SDL_GL_SwapWindow(this->window);
 
@@ -95,7 +95,6 @@ void Renderer::render(Scene scene, Uint32 startTime, Uint32 budget)
 
 void Renderer::frameDone(void)
 {
-	glClearColor(.8, .2, .5, 1);
 	SDL_GL_SwapWindow(this->window);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
